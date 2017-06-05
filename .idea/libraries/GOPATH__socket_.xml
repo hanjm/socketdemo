@@ -1,0 +1,47 @@
+<component name="libraryTable">
+  <library name="GOPATH &lt;socket&gt;">
+    <CLASSES>
+      <root url="file://$PROJECT_DIR$/../app_comet" />
+      <root url="file://$PROJECT_DIR$/../middleware" />
+      <root url="file://$PROJECT_DIR$/../appauth" />
+      <root url="file://$PROJECT_DIR$/../ngautlog" />
+      <root url="file://$PROJECT_DIR$/../goim" />
+      <root url="file://$PROJECT_DIR$/../friend" />
+      <root url="file://$PROJECT_DIR$/../apns_consumer" />
+      <root url="file://$PROJECT_DIR$/../aliyunsdk" />
+      <root url="file://$PROJECT_DIR$/../gopkg.in" />
+      <root url="file://$PROJECT_DIR$/../api_code" />
+      <root url="file://$PROJECT_DIR$/../github.com" />
+      <root url="file://$PROJECT_DIR$/../solo-passport" />
+      <root url="file://$PROJECT_DIR$/../git.apache.org" />
+      <root url="file://$PROJECT_DIR$/../golang.org" />
+      <root url="file://$PROJECT_DIR$/../go.uber.org" />
+      <root url="file://$PROJECT_DIR$/../zaplog" />
+      <root url="file://$PROJECT_DIR$/../user" />
+      <root url="file://$PROJECT_DIR$/../fasthttpmiddleware" />
+    </CLASSES>
+    <SOURCES>
+      <root url="file://$PROJECT_DIR$/../app_comet" />
+      <root url="file://$PROJECT_DIR$/../middleware" />
+      <root url="file://$PROJECT_DIR$/../appauth" />
+      <root url="file://$PROJECT_DIR$/../ngautlog" />
+      <root url="file://$PROJECT_DIR$/../goim" />
+      <root url="file://$PROJECT_DIR$/../friend" />
+      <root url="file://$PROJECT_DIR$/../apns_consumer" />
+      <root url="file://$PROJECT_DIR$/../aliyunsdk" />
+      <root url="file://$PROJECT_DIR$/../gopkg.in" />
+      <root url="file://$PROJECT_DIR$/../api_code" />
+      <root url="file://$PROJECT_DIR$/../github.com" />
+      <root url="file://$PROJECT_DIR$/../solo-passport" />
+      <root url="file://$PROJECT_DIR$/../git.apache.org" />
+      <root url="file://$PROJECT_DIR$/../golang.org" />
+      <root url="file://$PROJECT_DIR$/../go.uber.org" />
+      <root url="file://$PROJECT_DIR$/../zaplog" />
+      <root url="file://$PROJECT_DIR$/../user" />
+      <root url="file://$PROJECT_DIR$/../fasthttpmiddleware" />
+    </SOURCES>
+    <excluded>
+      <root url="file://$PROJECT_DIR$/../socketdemo" />
+    </excluded>
+  </library>
+</component>
