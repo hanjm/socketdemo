@@ -2,83 +2,116 @@ package main
 
 import (
 	"encoding/binary"
+	"encoding/json"
 	"errors"
-	"github.com/hanjm/log"
+	"hash/adler32"
 	"io"
-	"net"
 )
 
 var ErrUnexpectedLength = errors.New("unexpected length")
+var ErrUnexpectedCheckSum = errors.New("unexpected checkSum")
+
+const (
+	// Protocol.Ver
+	Ver = 1
+	// Protocol.typ
+	PingMsg = 1
+	PongMsg = 2
+	AuthMsg = 3
+	BinMsg  = 4
+	TextMsg = 5
+	JsonMsg = 6
+	PbMsg   = 7
+)
 
 // Protocol 定义消息协议
-// typ 1 ping
-// typ 2 pong
-// typ 3 bin
-// typ 4 text
-// typ 5 json
-// typ 6 auth
 // ----------------------------------------
 //  ver  | typ  | len   | body   |
 //  int8 | int8 | int32 | []byte |
 // ----------------------------------------
 type Protocol struct {
-	ver  int8   // 消息协议版本
-	typ  int8   // 消息类型
-	len  int32  // body长度
-	body []byte // 消息体
+	ver      int8   // 消息协议版本
+	typ      int8   // 消息类型
+	len      int32  // body长度
+	body     []byte // 消息体
+	checkSum uint32 // 校验和
 }
 
-func (p Protocol) WriteTo(c net.Conn) error {
+func (p Protocol) WriteTo(w io.Writer) error {
 	// write ver
-	err := binary.Write(c, binary.BigEndian, p.ver)
+	err := binary.Write(w, binary.BigEndian, p.ver)
 	if err != nil {
 		return err
 	}
 	// write type
-	err = binary.Write(c, binary.BigEndian, p.typ)
+	err = binary.Write(w, binary.BigEndian, p.typ)
 	if err != nil {
 		return err
 	}
 	// write length
-	err = binary.Write(c, binary.BigEndian, p.len)
+	err = binary.Write(w, binary.BigEndian, p.len)
 	if err != nil {
 		return err
 	}
 	// data
-	n, err := c.Write(p.body)
+	n, err := w.Write(p.body)
 	if err != nil {
 		return err
 	}
 	if n != int(p.len) {
 		return ErrUnexpectedLength
 	}
-	log.Debugf("write %d bytes, data:%s", p.len, p.body)
+	// checksum
+	p.checkSum = adler32.Checksum(p.body)
+	err = binary.Write(w, binary.BigEndian, p.checkSum)
+	if err != nil {
+		return err
+	}
+	//log.Debugf("write %d bytes, data:%s", p.len, p.body)
 	return err
 }
 
-func (p *Protocol) ReadFrom(c net.Conn) error {
+func (p *Protocol) ReadFrom(w io.Reader) error {
 	// read ver
-	err := binary.Read(c, binary.BigEndian, &p.ver)
+	err := binary.Read(w, binary.BigEndian, &p.ver)
 	if err != nil {
 		return err
 	}
 	// read type
-	err = binary.Read(c, binary.BigEndian, &p.typ)
+	err = binary.Read(w, binary.BigEndian, &p.typ)
 	if err != nil {
 		return err
 	}
 	// length
-	err = binary.Read(c, binary.BigEndian, &p.len)
+	err = binary.Read(w, binary.BigEndian, &p.len)
 	if err != nil {
 		return err
 	}
 	// read body
 	var body = make([]byte, p.len)
-	n, err := io.LimitReader(c, int64(p.len)).Read(body)
+	n, err := io.LimitReader(w, int64(p.len)).Read(body)
 	if n != int(p.len) {
 		return ErrUnexpectedLength
 	}
 	p.body = body
-	log.Debugf("read %d bytes, data:%s", p.len, p.body)
+	// checksum
+	checkSum := adler32.Checksum(p.body)
+	err = binary.Read(w, binary.BigEndian, &p.checkSum)
+	if err != nil {
+		return err
+	}
+	if checkSum != p.checkSum {
+		return ErrUnexpectedCheckSum
+	}
+	//log.Debugf("read %d bytes, data:%s", p.len, p.body)
 	return err
+}
+
+func WriteJson(w io.Writer, data interface{}) error {
+	msgBody, err := json.Marshal(data)
+	if err != nil {
+		return err
+	}
+	msg := Protocol{ver: Ver, typ: JsonMsg, len: int32(len(msgBody)), body: msgBody}
+	return msg.WriteTo(w)
 }
